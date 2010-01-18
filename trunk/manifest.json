@@ -1,0 +1,14 @@
+{
+  "name": "ChromoDoro",
+  "version": "1.1.0.1",
+  "description": "Pomodoro kitchen timer for Chrome.",
+  "background_page": "background.html",
+  "browser_action": {
+    "default_icon": "chromodoro.png"
+  },
+  "permissions": [
+    "tabs"
+   ],  
+  "options_page": "options.html",
+  "icons": { "48": "icon48.png" }
+}

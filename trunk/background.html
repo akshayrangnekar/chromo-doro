@@ -1,0 +1,86 @@
+<html>
+<head>
+<script>
+
+var timer_period = 5000; //five seconds
+
+chrome.browserAction.onClicked.addListener(function(tab) {
+	toggle();
+});
+
+
+var timeout = null;
+
+var working = false;
+function toggle() {
+	if (!working) {
+		work();		
+	} else {
+		chrome.browserAction.setBadgeText({text:''});
+		clearTimeout(timeout);
+	}
+	working = !working;
+}
+
+
+function work() {
+	var work_length = (localStorage['work_length'] ? localStorage['work_length']*1 : 25)*60;
+	countdown(work_length);
+	worktick();
+}
+	
+function worktick() {
+  var rest = time_left();
+	if (rest <= 0) {
+		chrome.windows.create({
+				url:'good-job.html',
+				width:150,
+				height:350
+			});
+		sleep();
+	} else {
+    var m = digit(Math.floor(rest / 60));  
+		chrome.browserAction.setBadgeText({text:Math.round(m)+''});
+		timeout = setTimeout("worktick()", timer_period);
+	}  
+}
+
+function sleep() {
+  var rest_length = (localStorage['rest_length'] ? localStorage['rest_length']*1 : 5)*60;
+	countdown(rest_length);
+	chrome.browserAction.setBadgeText({text:'zzz'});
+	sleeptick();
+}
+
+function sleeptick() {
+	if (time_left() <= 0) {
+		work();
+	} else {
+		timeout = setTimeout("sleeptick()", timer_period);
+	}  
+}
+
+// timer
+
+var started_at = null;
+var count_down = null;
+
+function countdown(seconds) {
+	count_down = seconds;
+  started_at = new Date().getTime();
+}
+
+function time_left() {
+	return count_down - (((new Date().getTime()) - started_at)/1000)
+}
+
+function digit(d) {
+	return d < 10 ? '0'+d : d;
+}
+	
+/**/	
+</script>
+</head>
+<body>
+</body>
+</html>
