@@ -9,3 +9,10 @@
 
 == 1.2.2 ==
  * don't show zero in countdown
+
+== 1.3.2 ==
+ * play sound after period changes
+ * sounds are optional
+ * opening window is optional
+ * let user choose the icon (colorful, translucent, grayscale)
+ * fixed bug with unstoppable timer
