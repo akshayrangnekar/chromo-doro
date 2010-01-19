@@ -103,7 +103,7 @@ var Timer = function(storage) {
       }
       rest = time_left(now);
       chrome.browserAction.setBadgeText({
-        text : Math.round(rest / 60)+''
+        text : Math.ceil(rest / 60)+''
       });
     } catch (e) {
     	console.error(e);
