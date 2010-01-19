@@ -15,10 +15,12 @@ var Timer = function(storage) {
   
   var beepObject = null;
   function beep() {
-    if (!beepObject) {
-      beepObject = document.getElementById('beep');
+    if (storage['play_sound'] == 'true') {
+      if (!beepObject) {
+        beepObject = document.getElementById('beep');
+      }
+      beepObject.Play();
     }
-    beepObject.Play();
   }   
   
   // timer functions
@@ -42,11 +44,13 @@ var Timer = function(storage) {
   // good Job window
   
   function goodJob() {
-    chrome.windows.create({
-        url:'good-job.html',
-        width:150,
-        height:350
-      });
+    if (storage['open_window'] == 'true') { 
+      chrome.windows.create({
+          url:'good-job.html',
+          width:150,
+          height:350
+        });
+    }
   }
   
   
