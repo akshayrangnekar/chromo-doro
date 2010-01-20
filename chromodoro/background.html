@@ -15,7 +15,7 @@ var Timer = function(storage) {
   
   var beepObject = null;
   function beep() {
-    if (storage['play_sound'] == 'true') {
+    if (load('play_sound', 'true') == 'true') {
       if (!beepObject) {
         beepObject = document.getElementById('beep');
       }
@@ -44,7 +44,7 @@ var Timer = function(storage) {
   // good Job window
   
   function goodJob() {
-    if (storage['open_window'] == 'true') { 
+    if (load('open_window', 'true') == 'true') { 
       chrome.windows.create({
           url:'good-job.html',
           width:150,
@@ -144,6 +144,7 @@ var Timer = function(storage) {
 
   chrome.browserAction.onClicked.addListener(function(tab) {
     if (storage['period'] != 'working' && storage['period'] != 'resting') {
+	    self.now = new Date().getTime();
       work(true);
       self.tick();
     } else {    
