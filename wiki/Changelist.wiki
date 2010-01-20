@@ -16,3 +16,6 @@
  * opening window is optional
  * let user choose the icon (colorful, translucent, grayscale)
  * fixed bug with unstoppable timer
+
+== 1.3.3 ==
+ * fixed first start bug
