@@ -1,0 +1,51 @@
+
+#testLogger {
+	width:95% 
+	padding:0.5em;
+}
+#testLogger .yui-console {
+	position:static;
+	width:100%;
+	height:auto;
+	z-index:50;
+}
+#testLogger .yui-console .yui-console-content {
+	width:100%;
+	border:none;
+	/*height:90%;*/
+}
+#testLogger .yui-console-focus .yui-console-content {
+	border:none;
+}	
+#testLogger .yui-console .yui-console-bd {
+	height:auto;
+	border:none;
+}
+#testLogger .yui-console-hd {
+	display:none;
+}
+#testLogger .yui-console-ft {
+	display:none;
+}
+#testLogger .yui-console-entry-time, #testLogger .yui-console-entry-src {
+	display:none;
+}
+#testLogger .yui-console .yui-console-entry-cat {
+	float:left;
+	margin-right:1em;
+	padding:1px 4px;
+	text-align:center;
+	min-width:6em;
+}
+#testLogger .yui-console-entry-pass .yui-console-entry-cat {
+	background-color:#3f3;
+}
+#testLogger .yui-console-entry-fail .yui-console-entry-cat {
+	background-color:#f33;
+}
+#testLogger  .yui-console-entry {
+	border-bottom:1px dotted #AAAAAA;
+	margin:0;
+	padding:0;		
+	line-height:1;
+}
