@@ -75,9 +75,6 @@ ChromoDoroPopup = (function(ackFor) {
       
     });
   }
-  
-  //var port = chrome.extension.connect();
-  //port.postMessage({message: "acknowledgeBreak", values: {}});
 
 });
 
@@ -92,10 +89,6 @@ chrome.extension.onRequest.addListener(
         sendResponse({understood: "ok"});
       }
     }
-//    if (request.showAckFor) {
-//      alert('ack');
-//      window.chromoDoroPopup = new ChromoDoroPopup(request.showAckFor);
-//    }
   });
 
 
@@ -103,9 +96,3 @@ chrome.extension.sendRequest({popupReady: true}, function(response) {
   console.log(response);
   window.chromoDoroPopup = new ChromoDoroPopup(response.showAckFor);
 });
-
-
-
-//chrome.extension.sendRequest({showAckFor: 'rest'});
-
-//window.chromoDoroPopup = new ChromoDoroPopup();
