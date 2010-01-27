@@ -60,6 +60,50 @@ bdd.scenario("EventPoint Usage", function(a) {
 
       a.areEqual(1, called);
 		},
+		shouldCatchExceptiones: function () {
+      var Framework = function() {
+        this.onError = new EventPoint(this);
+      }
+
+      var savedTheSituation = false;
+
+      var fw = (new Framework()).
+        onError.addListener(function(e) {
+            savedTheSituation = true;
+          }).
+        onError.addListener(function(e) {
+            throw new Error('Oh noes!');
+          });
+
+      fw.onError.fire();
+
+      a.isTrue(savedTheSituation);
+		},
+		shouldReturnFiredEvent: function () {
+      var Framework = function() {
+        this.onError = new EventPoint(this);
+      }
+      var fw = new Framework();
+      var e = fw.onError.fire({severity:'extreme'});
+
+      a.areEqual('extreme', e.severity);
+		},
+		shouldCallListenersWithinTargetScope: function () {
+      var Framework = function() {
+        this.onError = new EventPoint(this);
+      }
+
+      var scope = null;
+      
+      var fw = (new Framework()).
+        onError.addListener(function(e) {
+            scope = this;
+          })
+
+      fw.onError.fire({severity:'extreme'});
+
+      a.areEqual(fw, scope);
+		},
 	});
 });
 
@@ -70,7 +114,7 @@ bdd.scenario("State Machine Definition", function(a) {
 		shouldHaveName : function () {
 			var machine = new FSM("Life");
 			a.areEqual('Life', machine.name);
-		},    
+		},
 		shouldWork : function () {
 			var machine = new FSM("DayAndNight");
 			machine.addState('night').addListener(function(e) {
@@ -80,7 +124,6 @@ bdd.scenario("State Machine Definition", function(a) {
       });
 			machine.addState('day').addListener(function(e) {
         if (e.input == 'sunset') {
-          //console.log(this);
           this.machine.setState('night');
         }
       });
@@ -98,7 +141,7 @@ bdd.scenario("State Machine Definition", function(a) {
 			var machine = new FSM("Life");
 			var state = machine.addState('living');
 			a.areEqual('living', state.name);
-		},    
+		},
 		shouldDefineListeners : function () {
 			var machine = new FSM("Life");
       var called = false;
@@ -125,9 +168,9 @@ bdd.scenario("State Machine Definition", function(a) {
       
       machine.addState('living').
         addListener(function() {
-          called += 1 }).
+          called += 1}).
         addListener(function() {
-          called += 2 })
+          called += 2})
 
       machine.setState('living');
       machine.accept('yearPassed');
@@ -137,14 +180,25 @@ bdd.scenario("State Machine Definition", function(a) {
 			var machine = new FSM("Day/Night");
       var sun = false;
       var state = machine.addState('day');
-      console.log(state);
       a.isObject(state.onEnter);
       state.onEnter.addListener(function(event) {
         sun = true;
       });
       machine.setState('day');
 			a.areEqual(true, sun);
-		},        
+		},
+		shouldCallListenersOfAccept : function () {
+			var machine = new FSM("Day/Night");
+      var e = null;
+
+			machine.addState('day').addListener(function(event) {
+        e = event;
+      });
+
+      machine.setState('day');
+      machine.accept('sunrise');
+			a.areEqual('sunrise', e.input);
+		},
 	});
   
 
@@ -154,15 +208,15 @@ bdd.scenario("State Machine Definition", function(a) {
       var called = 0;
       machine.addState('living').
         addListener(function(event) {
-          called += 1;
-            event.stop();
+            called += 1;
           }).
-        addListener(function() {
+        addListener(function(event) {
             called += 2;
+            event.stop();
           })
       machine.setState('living');
       machine.accept('anything');
-			a.areEqual(1, called);
+			a.areEqual(2, called);
 		},       
 	});
   	
@@ -194,8 +248,9 @@ bdd.scenario("State Machine Running", function(a) {
 			var machine = new FSM("Day/Night");
       var changed = false;
       machine.addState('day');
-      machine.onChange.addListener(function() {
+      machine.onChange.addListener(function(event) {
         changed = true;
+        event.accept();
       })
       machine.setState('day');
       a.isTrue(changed);

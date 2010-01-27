@@ -33,15 +33,12 @@ ChromoDoroPopup = (function(ackFor) {
   doc.write("button { font-size:1.05em; line-height:170%; } ");
   doc.write("h2 { margin-bottom:0.5em; } ");
   doc.write("</style><body>");
-
   if (ackFor == 'rest') {
     doc.write("<h2>You're done!</h2><span>Now <button id=\"ack\">take a break</button>.</span>");
   }
-
   if (ackFor == 'work') {
     doc.write("<h2>Get ready!</h2><span>And get <button id=\"ack\">back to work</button>.</span>");
   }
-
   doc.write("</body></html>");
   doc.close();
   
@@ -103,6 +100,7 @@ chrome.extension.onRequest.addListener(
 
 
 chrome.extension.sendRequest({popupReady: true}, function(response) {
+  console.log(response);
   window.chromoDoroPopup = new ChromoDoroPopup(response.showAckFor);
 });
 

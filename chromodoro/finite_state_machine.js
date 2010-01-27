@@ -1,7 +1,5 @@
 
-
-var Event = function(input) {
-  this.input = input;
+var Event = function(args) {
   this.stopped = false;
   this.accepted = false;
 
@@ -11,59 +9,69 @@ var Event = function(input) {
   this.stop = function() {
     this.stopped = true;
   }
+
+  this.notifyListener = function(fn, eatExceptions) {
+    if (eatExceptions) {
+      try {
+        fn.apply(this.target, [this]);
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      fn.apply(this.target, [this]);
+    }
+  }
+
+  for (var a in args) {
+    this[a] = args[a];
+  }
 }
 
-EventPoint = function(target) {
+
+EventPoint = function(target, eatExceptions) {
+  eatExceptions = typeof(eatExceptions) != 'undefined'  ? eatExceptions : true;
   this.listeners = [];
   this.addListener = function(fn) {
     this.listeners.push(fn);
     return target;
   }
   this.fire = function(args) {
-    var event = new Event();
-    for (var a in args) {
-      event[a] = args[a];
-    }
+    var event = new Event(args);
     event.target = target;
     for (var i = this.listeners.length-1; i >= 0; i--) {
-      this.listeners[i].apply(target, [event]);
+      event.notifyListener(this.listeners[i], eatExceptions);
       if (event.stopped) {
         break;
       }
     }
+    return event;
   }
 }
   
 
-FSM = function(name) {	
+FSM = function(name, strict) {
   this.name = name;
   this.states = {};
+  this.strict = strict ? strict : false;
 
-  var State = function(fsm, name) {
+  var State = function(fsm, name) {    
     this.machine = fsm;
     this.name = name;
-    this.listeners = [];
+    this.eventPoint = new EventPoint(this, false);
+    this.onEnter = new EventPoint(this);
     
     this.addListener = function(fn) {
-      this.listeners.push(fn);
+      this.eventPoint.addListener(fn);
       return this;
     }
     
-    this.onEnter = new EventPoint(this);
-    
     this.accept = function(input) {
-      var event = new Event(input);
-      for (var i = 0; i < this.listeners.length; i++) {
-        this.listeners[i].apply(this, [event]);
-        if (event.stopped) {        
-          break;
-        }
+      var event = this.eventPoint.fire({input : input});
+
+      // strict machiiine....
+      if (this.machine.strict && !event.accepted) {
+        throw new Error('Input '+input+' not accepted by any listener of '+this.name+'.');
       }
-      /*
-      if (!event.accepted) {
-        throw('Input '+input+' not accepted by any listener of '+this.name+'.');
-      }
-      */
     }
   }
   
@@ -93,8 +101,7 @@ FSM = function(name) {
     this.state.accept(input);
   }
 
-  this.onChange = new EventPoint(this);
-
+  this.onChange = new EventPoint(this, false);
 
   // init state with warning about unset state
   this.defaultInitialState = (new State(this, null)).addListener(function() {
