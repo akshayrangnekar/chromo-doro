@@ -1,0 +1,31 @@
+#summary How you can support the extension development.
+
+= Make ChromoDoro better =
+
+ * [mailto:michal.hantl@gmail.com Tell me how you use ChromoDoro]
+ * [http://code.google.com/p/chromo-doro/issues/list Enter bug or enhancement]
+ * [http://code.google.com/p/chromo-doro/issues/list Vote for enhancements]
+
+
+
+= Support development =
+
+ * [mailto:michal.hantl@gmail.com Sponsor a feature]
+ * Show your support by donating a dollar or few
+
+<a href='http://www.pledgie.com/campaigns/8385'><img alt='Click here to lend your support to: ChromoDoro development and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/8385.png?skin_name=chrome' border='0' /></a>
+
+Why donate:
+
+{{{
+Dear fellow time manager
+
+As a regular developer sacrifice my own free time to provide
+the extension you are using and I do my best to maintain it
+as awesome as I can.
+
+It would mean a great deal to me if you show your support and
+send a dollar or few.
+
+The money will be spent on books and will keep my spirits up!
+}}}
