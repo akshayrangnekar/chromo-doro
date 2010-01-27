@@ -1,0 +1,12 @@
+#summary One-sentence summary of this page.
+
+ChromoDoro? Chrome extesnsion for practising Pomodoro Technique
+
+Pomodoro Technique™ is a simple time management using kitchen timer set to 25 minutes for uninterrupted working and then again to 5 minutes of rest.
+
+ * click to activate 25 minute work timer
+ * then take a 5 minute break
+ * timer sets itself for the 25 minutes again
+ * To stop the timer, click the tomato again.
+
+More about Pomodoro Technique™ at http://www.pomodorotechnique.com/
