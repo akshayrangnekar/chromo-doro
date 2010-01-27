@@ -1,13 +1,49 @@
 
 Timer = function(storage, ch) {
   var self = this;
-  var timer_period = 5000; //check time every five seconds
+  var timer_period = 5*1000; //check time every few seconds
   var timer = self;
 
   // load defaultized setting from localStorage
   function load(name, default_value) {
     return storage[name] ? storage[name] : default_value;
   }
+
+
+  // timer functions
+
+  this.getTime = function() {
+  	return self.now = new Date().getTime();
+  }
+
+  this.getTime();
+
+  function countdown(seconds) {
+    storage['count_down'] = seconds;
+    storage['started_at'] = self.now;
+  }
+
+  function seconds_past(from) {
+  	return (self.getTime() - from)/1000;
+  }
+
+  function time_left() {
+    return storage['count_down'] - seconds_past(storage['started_at']);
+  }
+
+  // send 'tick' to state machine every few seconds
+  this.tick = function(set_timeout, continue_timeout) {
+    //console.log(time_left());
+    this.machine.accept('tick');
+
+    if (set_timeout || continue_timeout) {
+      if (set_timeout && self.timeout > 0) {
+        throw new Error('Timer already set.');
+      }
+      self.timeout = setTimeout("timer.tick(false, true)", timer_period);
+    }
+  }
+  
 
 
   // play sound
@@ -17,7 +53,9 @@ Timer = function(storage, ch) {
       if (!beepObject) {
         beepObject = document.getElementById('beep');
       }
-      beepObject.Play();
+      if (beepObject) {
+        beepObject.Play();
+      }
     }
   }
 
@@ -52,27 +90,24 @@ Timer = function(storage, ch) {
   };
 
 
+
   var Popup = function(ackFor) {
     var self = this;
     
     this.tabChange = function (tabId, o) {
-      try {
-        self.hidePopup();
-        self.selectedTab = [tabId, o.windowId];
-        insertToPage('script', 'popup.js');
-        
-      } catch (e) {
-        console.log(e);
-      }
+      self.hidePopup();
+      self.selectedTab = [tabId, o.windowId];
+      insertToPage('script', 'popup.js');        
     };
 
     this.hidePopup = function() {
       try {
-        ch.tabs.sendRequest(self.selectedTab[0], {
-            popup: "hide"
-        });
+        ch.tabs.sendRequest(
+          self.selectedTab[0],
+          { popup: "hide" }
+        );
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     }
 
@@ -84,9 +119,8 @@ Timer = function(storage, ch) {
     ch.tabs.onSelectionChanged.addListener(this.tabChange);
 
     // show popup right away
-    insertToPage('script', 'popup.js');    
+    insertToPage('script', 'popup.js');
     
-    timer.ackFor = ackFor;
     ch.tabs.getSelected(null, function (o) {
       self.selectedTab = [o.id, o.windowId];
     })
@@ -95,12 +129,14 @@ Timer = function(storage, ch) {
 
   // events
 
-  this.requestAckFor = new EventPoint(this);
+  this.requestAckFor = new EventPoint(this, false);
 
   this.requestAckFor.addListener(function (e) {
-      //insertToPage('script', 'popup.js');
-      self.stateToAck = e.state;
-      self.popup = new Popup(e.state);
+      if (!e.state) {        
+        throw new Exception('Must specify a state to ack.');
+      }
+      timer.stateToAck = e.state;
+      timer.popup = new Popup(e.state);
     });
 
 
@@ -114,51 +150,14 @@ Timer = function(storage, ch) {
 
 
 
-  // timer functions
-
-  this.getTime = function() {
-  	return self.now = new Date().getTime();
-  }
-
-  this.getTime();
-
-
-  function countdown(seconds) {
-    storage['count_down'] = seconds;
-    storage['started_at'] = self.now;
-  }
-
-
-
-  function seconds_past(from) {
-  	return (self.getTime() - from)/1000;
-  }
-  
-  function time_left() {
-    return storage['count_down'] - seconds_past(storage['started_at']);
-  }
-
-
-
-  // send 'tick' to state machine every few seconds
-  this.tick = function(set_timeout, continue_timeout) {
-    this.machine.accept('tick');
-
-    if (set_timeout || continue_timeout) {
-      if (set_timeout && self.timeout > 0) {
-        throw new Error('Timer already set.');
-      }
-      self.timeout = setTimeout("timer.tick(false, true)", timer_period);
-    }
-  }
-  
   
 
   // the mighty state machine
   
-  this.machine = (new FSM()).
+  this.machine = (new FSM('ChromoDoro', true)).
     onChange.addListener(function(e) {
       storage['period'] = e.newState.name;
+      //console.log(e.oldState.name +' -> '+ e.newState.name);
     });
 
   // every tick update the counter and tooltip
@@ -179,15 +178,13 @@ Timer = function(storage, ch) {
   // -- STOPPED -- 
   this.machine.addState('stopped').
     onEnter.addListener(function(e) {
-        ch.browserAction.setBadgeText({
-          text : ''
-        });
+        ch.browserAction.setBadgeText({text : ''});
         clearTimeout(self.timeout);
-        self.timeout = null;
+        timer.timeout = null;
       }).
     addListener(function(e) {
         if (e.input == 'click') {
-          countdown(load('work_length', 25) * 60, true);
+          countdown(load('work_length', 25) * 60);
           this.machine.setState('working');
           // start ticking
           self.tick(true);
@@ -218,7 +215,9 @@ Timer = function(storage, ch) {
     addListener(function(e) {
         if (e.input == 'tick' && time_left() <= 0) {
           this.machine.setState('waiting for rest ack');
-        }
+          e.accept();
+          e.stop();
+        }        
       });
     
 
@@ -227,15 +226,13 @@ Timer = function(storage, ch) {
   this.machine.addState('waiting for rest ack').
     onEnter.addListener(function() {
         ch.browserAction.setBadgeText({text : 'ACK'});
-        beep();
         self.requestAckFor.fire({state:'rest'});
+        beep();
       }).
     addListener(function(e) {
         if (e.input == 'ack rest') {
-          // start ticking
-          countdown(load('rest_length', 5) * 60, true);
-          this.machine.setState('resting');
           e.accept();
+          this.machine.setState('start resting');
         }
       }).
     addListener(stop).
@@ -245,6 +242,20 @@ Timer = function(storage, ch) {
         }
       });
 
+
+  // -- START RESTING --
+  this.machine.addState('start resting').
+    onEnter.addListener(function(e) {
+        // start countdown
+        countdown(load('rest_length', 5) * 60);
+        e.accept();
+        this.machine.setState('resting');
+      }).
+    addListener(function(e) {
+        if (e.input == 'tick') {
+          e.accept();
+        }
+      })
 
   // -- RESTING --
   this.machine.addState('resting').
@@ -265,7 +276,7 @@ Timer = function(storage, ch) {
   // -- WAITING FOR WORK ACK --
   this.machine.addState('waiting for work ack').
     onEnter.addListener(function() {
-      ch.browserAction.setBadgeText({text : 'ACK'});
+        ch.browserAction.setBadgeText({text : 'ACK'});
         self.requestAckFor.fire({state:'work'});
         beep();
       }).
@@ -298,18 +309,17 @@ Timer = function(storage, ch) {
 
   ch.extension.onRequest.addListener(
     function(request, sender, sendResponse) {
-      if (request.popupReady) {
-        //ch.extension.sendRequest(tabId, {showAckFor: 'rest'});
-        sendResponse({showAckFor: timer.ackFor});
-      }
-      if (request.name == "ackRest") {
-        sendResponse('ok');
-        self.giveAckFor.fire();
-        self.popup.close();
-        self.popup = null;
-        //self.machine.accpept('ack rest');
-      } else {
-        sendResponse({});
+      try {
+        if (request.popupReady) {
+          sendResponse({showAckFor: timer.stateToAck});
+        } else if (request.name == "ackRest") {
+          self.giveAckFor.fire();
+          self.popup.close();
+          self.popup = null;
+          sendResponse('ok');
+        }
+      } catch (e) {
+        console.error(e);
       }
     }
   );
