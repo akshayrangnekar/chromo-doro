@@ -20,9 +20,8 @@ Why donate:
 {{{
 Dear fellow time manager
 
-As a regular developer sacrifice my own free time to provide
-the extension you are using and I do my best to maintain it
-as awesome as I can.
+As a regular developer I sacrifice my own free time to provide
+the extension you are using.
 
 It would mean a great deal to me if you show your support and
 send a dollar or few.
