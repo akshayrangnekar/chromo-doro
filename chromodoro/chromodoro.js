@@ -13,14 +13,14 @@ Timer = function(storage, ch) {
   // timer functions
 
   this.getTime = function() {
-  	return self.now = new Date().getTime();
+  	return new Date().getTime();
   }
 
   this.getTime();
 
   function countdown(seconds) {
     storage['count_down'] = seconds;
-    storage['started_at'] = self.now;
+    storage['started_at'] = self.getTime();
   }
 
   function seconds_past(from) {
@@ -33,7 +33,9 @@ Timer = function(storage, ch) {
 
   // send 'tick' to state machine every few seconds
   this.tick = function(set_timeout, continue_timeout) {
-    //console.log(time_left());
+    if (timer.DEBUG) {
+      console.log(time_left());
+    }
     this.machine.accept('tick');
 
     if (set_timeout || continue_timeout) {
@@ -48,11 +50,11 @@ Timer = function(storage, ch) {
 
   // play sound
   //var sound = null;
-  function beep() {
+  this.beep = function () {
     if (load('play_sound', 'true') == 'true') {
       // haha :), this works perfectly
       document.open();
-      document.write('<embed src="beep.swf" play="true" loop="false" width="5" height="5" swliveconnect="true"></embed>');
+      document.write('<embed src="beep.swf" play="true" loop="false" width="5" height="5" >');
       document.close();
     }
   }
@@ -78,11 +80,11 @@ Timer = function(storage, ch) {
           method.call(ch.tabs, null, {file: file}, callback);
         } catch(e) {
           // This time something really bad happened, logging and ignoring
-          console.log(e);
+          console.error(e);
         }
       } else {
         // We don't know the motive, logging and ignoring
-        console.log(e);
+        console.error(e);
       }
     }
   };
@@ -155,7 +157,9 @@ Timer = function(storage, ch) {
   this.machine = (new FSM('ChromoDoro', true)).
     onChange.addListener(function(e) {
       storage['period'] = e.newState.name;
-      //console.log(e.oldState.name +' -> '+ e.newState.name);
+      if (timer.DEBUG) {
+        console.log(e.oldState.name +' -> '+ e.newState.name);
+      }
     });
 
   // every tick update the counter and tooltip
@@ -175,10 +179,17 @@ Timer = function(storage, ch) {
 
   // -- STOPPED -- 
   this.machine.addState('stopped').
-    onEnter.addListener(function(e) {
+    onEnter.addListener(function(e) {    
         ch.browserAction.setBadgeText({text : ''});
+        ch.browserAction.setTitle({title:'Click to activate.'});
+        
         clearTimeout(self.timeout);
         timer.timeout = null;
+
+        // close ack request if showting
+        if (self.popup) {
+          self.popup.close();
+        }
       }).
     addListener(function(e) {
         if (e.input == 'click') {
@@ -225,7 +236,7 @@ Timer = function(storage, ch) {
     onEnter.addListener(function() {
         ch.browserAction.setBadgeText({text : 'ACK'});
         self.requestAckFor.fire({state:'rest'});
-        beep();
+        timer.beep();
       }).
     addListener(function(e) {
         if (e.input == 'ack rest') {
@@ -276,7 +287,7 @@ Timer = function(storage, ch) {
     onEnter.addListener(function() {
         ch.browserAction.setBadgeText({text : 'ACK'});
         self.requestAckFor.fire({state:'work'});
-        beep();
+        timer.beep();
       }).
     addListener(function(e) {
         if (e.input == 'ack work') {

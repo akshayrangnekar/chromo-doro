@@ -108,6 +108,8 @@ TimerMock = (function(a, b) {
       e.stop();
     });
 
+  // no beeping here
+  timer.beep = function() {}
 
   for (var i in timer) {
   	this[i] = timer[i];
@@ -182,6 +184,7 @@ bdd.scenario("ChromoDoro usage", function(a) {
       // should stop the timer
       a.areEqual(null, timer._timer.timeout);      
       a.areEqual('', mock.browserAction.badgeText);
+      a.areEqual('Click to activate.', mock.browserAction.title.title);
 
       // sets countdown
       a.areEqual(25*60, ls['count_down']);
