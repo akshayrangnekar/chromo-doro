@@ -39,6 +39,10 @@ ChromoDoroPopup = (function(ackFor) {
   if (ackFor == 'work') {
     doc.write("<h2>Get ready!</h2><span>And get <button id=\"ack\">back to work</button>.</span>");
   }
+
+  doc.write('<audio src="beep.ogg" id="beep" ></audio>');
+  doc.write('<script>document.getElementById(\'beep\').play();</script>');
+
   doc.write("</body></html>");
   doc.close();
   

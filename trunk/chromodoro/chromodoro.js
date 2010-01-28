@@ -47,15 +47,13 @@ Timer = function(storage, ch) {
 
 
   // play sound
-  var beepObject = null;
+  //var sound = null;
   function beep() {
     if (load('play_sound', 'true') == 'true') {
-      if (!beepObject) {
-        beepObject = document.getElementById('beep');
-      }
-      if (beepObject) {
-        beepObject.Play();
-      }
+      // haha :), this works perfectly
+      document.open();
+      document.write('<embed src="beep.swf" play="true" loop="false" width="5" height="5" swliveconnect="true"></embed>');
+      document.close();
     }
   }
 
@@ -104,7 +102,7 @@ Timer = function(storage, ch) {
       try {
         ch.tabs.sendRequest(
           self.selectedTab[0],
-          { popup: "hide" }
+          {popup: "hide"}
         );
       } catch (e) {
         console.error(e);
