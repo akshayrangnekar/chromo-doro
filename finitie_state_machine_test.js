@@ -1,8 +1,6 @@
 function runTest() {
 
 
-
-
 bdd.scenario("EventPoint Usage", function(a) {
 
 	this.describe("EventPoint", {
