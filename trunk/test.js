@@ -257,7 +257,6 @@ bdd.scenario("ChromoDoro usage", function(a) {
 		},
 
 
-
 		shouldRestAfterAckingRest : function () {
 			var mock = new ChromeMock();
       var ls = {};
@@ -270,11 +269,11 @@ bdd.scenario("ChromoDoro usage", function(a) {
 
 			a.areEqual('resting', timer.machine.state.name);
 			a.areEqual('resting', ls['period']);
-      
+
       // showing 5 minutes in green
 			a.areEqual('5', mock.browserAction.badgeText);
       a.areEqual('0,180,0,255', mock.browserAction.badgeBackgroundColor+'');
-      
+
     	timer.setTime(60*1000);
       timer.tick();
 
@@ -282,7 +281,34 @@ bdd.scenario("ChromoDoro usage", function(a) {
 			a.areEqual('4', mock.browserAction.badgeText);
 		},
 
-    
+
+		shouldAckRestByClickingTheIcon : function () {
+			var mock = new ChromeMock();
+      var ls = {};
+			var timer = new TimerMock(ls, mock);
+
+      timer.setTime(0);
+
+      timer.machine.setState('waiting for rest ack');
+
+      // click the icon
+      mock.browserAction.onClicked.fire();
+
+			a.areEqual('resting', timer.machine.state.name);
+			a.areEqual('resting', ls['period']);
+
+      // showing 5 minutes in green
+			a.areEqual('5', mock.browserAction.badgeText);
+      a.areEqual('0,180,0,255', mock.browserAction.badgeBackgroundColor+'');
+
+    	timer.setTime(60*1000);
+      timer.tick();
+
+      // showing 25 minutes
+			a.areEqual('4', mock.browserAction.badgeText);
+		},
+
+
 		shouldNotCountWhileWaitingForRestAck : function () {
 			var mock = new ChromeMock();
 			var timer = new TimerMock({}, mock);
@@ -328,8 +354,29 @@ bdd.scenario("ChromoDoro usage", function(a) {
 
       // should be waiting for work ack
       a.areEqual('work', timer.requestedAck.state);
-      
+
       a.areEqual('ACK', mock.browserAction.badgeText);
+		},
+
+		shouldAckWorkingByClickingTheIcon: function () {
+			var mock = new ChromeMock();
+      var ls = {};
+			var timer = new TimerMock(ls, mock);
+
+    	timer.setTime(0);
+      timer.machine.setState('start resting');
+
+    	timer.setTime(5*60*1000);
+      timer.tick();
+
+      // state should change
+			a.areEqual('waiting for work ack', timer.machine.state.name);
+
+      // click the icon
+      mock.browserAction.onClicked.fire();
+
+      // should be waiting for work ack
+			a.areEqual('working', timer.machine.state.name);
 		},
 
 		shouldWorkAfterAckingWork : function () {

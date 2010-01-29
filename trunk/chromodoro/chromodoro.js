@@ -218,6 +218,11 @@ Timer = function(storage, ch) {
         // set badge to red
         self.tick(); //reset badge immediately
         ch.browserAction.setBadgeBackgroundColor({color:[180,0,0,255]});
+
+        // close ack request if showting
+        if (self.popup) {
+          self.popup.close();
+        }
       }).
     addListener(stop).
     addListener(tick).
@@ -244,7 +249,12 @@ Timer = function(storage, ch) {
           this.machine.setState('start resting');
         }
       }).
-    addListener(stop).
+    addListener(function(e) {
+        if (e.input == 'click') {
+          e.accept();
+          this.machine.accept('ack rest');
+        }
+      }).
     addListener(function(e) {
         if (e.input == 'tick') {
           e.accept();
@@ -259,6 +269,11 @@ Timer = function(storage, ch) {
         countdown(load('rest_length', 5) * 60);
         e.accept();
         this.machine.setState('resting');
+        
+        // close ack request if showting
+        if (self.popup) {
+          self.popup.close();
+        }
       }).
     addListener(function(e) {
         if (e.input == 'tick') {
@@ -296,7 +311,12 @@ Timer = function(storage, ch) {
           e.accept();
         }
       }).
-    addListener(stop).
+    addListener(function(e) {
+        if (e.input == 'click') {
+          e.accept();
+          this.machine.accept('ack work');
+        }
+      }).
     addListener(function(e) {
         if (e.input == 'tick') {
           e.accept();
