@@ -11,7 +11,7 @@
 = Support development =
 
  * [mailto:michal.hantl@gmail.com Sponsor a feature]
- * Show your support by donating a dollar or few
+ * Show your support by donating a dollar or few using paypal
 
 <a href='http://www.pledgie.com/campaigns/8385'><img alt='Click here to lend your support to: ChromoDoro development and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/8385.png?skin_name=chrome' border='0' /></a>
 
