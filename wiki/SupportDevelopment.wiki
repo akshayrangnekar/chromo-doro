@@ -1,35 +1,22 @@
 #summary How you can support the extension development.
 
-= Make ChromoDoro better =
+== Tell me your story ==
 
- * [mailto:michal.hantl@gmail.com Tell me how you use ChromoDoro]
- * [http://code.google.com/p/chromo-doro/issues/list Enter bug or enhancement]
- * [http://code.google.com/p/chromo-doro/issues/list Vote for enhancements]
+I would like to hear about what you use ChromoDoro for. [mailto:michal.hantl@gmail.com Tell me] with your story so I can make it better.
+
+You can also [http://code.google.com/p/chromo-doro/issues/list vote] for enhancements or [http://code.google.com/p/chromo-doro/issues/entry create] new ones.
 
 
 
-= Support development =
 
- * [mailto:michal.hantl@gmail.com Sponsor a feature]
- * Show your support by donating a dollar or few
+== Sponsor a feature ==
+
+Is there a feature you would like to have? Just [mailto:michal.hantl@gmail.com drop me an email].
+
+
+== Say "thank you" ==
+
+If you want to thank me, a dollar or few does that best :)
 
 <a href='http://www.pledgie.com/campaigns/8385'><img alt='Click here to lend your support to: ChromoDoro development and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/8385.png?skin_name=chrome' border='0' /></a>
 (uses paypal)
-
-
-Why donate:
-
-{{{
-Dear fellow time manager
-
-As a regular developer I sacrifice my own free time to provide
-the extension you are using.
-
-It would mean a great deal to me if you show your support and
-send a dollar or few.
-
-Thank you.
-
-Your developer
-Michal Hantl, Czech republic
-}}}
