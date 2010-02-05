@@ -2,7 +2,7 @@
 
 == Tell me your story ==
 
-I would like to hear about what you use ChromoDoro for. [mailto:michal.hantl@gmail.com Tell me] with your story so I can make it better.
+I would like to hear about what you use ChromoDoro for. [mailto:michal.hantl@gmail.com Tell me] your story so I can make it better.
 
 You can also [http://code.google.com/p/chromo-doro/issues/list vote] for enhancements or [http://code.google.com/p/chromo-doro/issues/entry create] new ones.
 
