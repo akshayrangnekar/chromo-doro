@@ -149,6 +149,29 @@ Timer = function(storage, ch) {
 
 
 
+  /* writing to user's dalendar */
+
+  //var calendarAppUrl = 'http://localhost:8080/create.html'; //for development
+  var calendarAppUrl = 'http://my-doings.appspot.com/api';
+
+  this.writePeriodToCalendar = function() {
+    if (load('calendar_sync', 'false') == 'false') {
+      console.log('calendar sync is turned off.')
+      return;
+    }
+    // work time = working time + decompression time
+    // -- since you need decompression after working to maintain
+    // high performance, it counts as work too.
+    var work_time = storage['count_down']*1 + (load('rest_length', 5) * 60);
+
+    console.log('trying to write to calendar');
+
+    this.iframos = document.createElement('iframe');
+    this.iframos.src = calendarAppUrl+'#create/ChromoDoro/'+work_time;
+    document.body.appendChild(this.iframos);
+  }
+
+
 
   
 
@@ -219,7 +242,7 @@ Timer = function(storage, ch) {
         self.tick(); //reset badge immediately
         ch.browserAction.setBadgeBackgroundColor({color:[180,0,0,255]});
 
-        // close ack request if showting
+        // close ack request if showing
         if (self.popup) {
           self.popup.close();
         }
@@ -228,6 +251,7 @@ Timer = function(storage, ch) {
     addListener(tick).
     addListener(function(e) {
         if (e.input == 'tick' && time_left() <= 0) {
+          setTimeout('timer.writePeriodToCalendar()', 1000);
           this.machine.setState('waiting for rest ack');
           e.accept();
           e.stop();
