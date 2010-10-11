@@ -1,6 +1,6 @@
 {
   "name": "ChromoDoro",
-  "version": "1.5.0.1",
+  "version": "1.5.1",
   "description": "Pomodoro kitchen timer for Chrome.",
   "background_page": "background.html",
   "browser_action": {
