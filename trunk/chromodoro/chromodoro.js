@@ -13,7 +13,7 @@ Timer = function(storage, ch) {
   // timer functions
 
   this.getTime = function() {
-  	return new Date().getTime();
+    return new Date().getTime();
   }
 
   this.getTime();
@@ -24,7 +24,7 @@ Timer = function(storage, ch) {
   }
 
   function seconds_past(from) {
-  	return (self.getTime() - from)/1000;
+    return (self.getTime() - from)/1000;
   }
 
   function time_left() {
@@ -45,7 +45,7 @@ Timer = function(storage, ch) {
       self.timeout = setTimeout("timer.tick(false, true)", timer_period);
     }
   }
-  
+
 
 
   // play sound
@@ -93,19 +93,19 @@ Timer = function(storage, ch) {
 
   var Popup = function(ackFor) {
     var self = this;
-    
+
     this.tabChange = function (tabId, o) {
       self.hidePopup();
       self.selectedTab = [tabId, o.windowId];
-      insertToPage('script', 'popup.js');        
+      insertToPage('script', 'popup.js');
     };
 
     this.hidePopup = function() {
       try {
         ch.tabs.sendRequest(
-          self.selectedTab[0],
-          {popup: "hide"}
-        );
+            self.selectedTab[0],
+            {popup: "hide"}
+            );
       } catch (e) {
         console.error(e);
       }
@@ -120,32 +120,34 @@ Timer = function(storage, ch) {
 
     // show popup right away
     insertToPage('script', 'popup.js');
-    
+
     ch.tabs.getSelected(null, function (o) {
       self.selectedTab = [o.id, o.windowId];
     })
   }
-  
+
 
   // events
 
   this.requestAckFor = new EventPoint(this, false);
 
   this.requestAckFor.addListener(function (e) {
-      if (!e.state) {        
-        throw new Exception('Must specify a state to ack.');
-      }
-      timer.stateToAck = e.state;
+    if (!e.state) {
+      throw new Exception('Must specify a state to ack.');
+    }
+    timer.stateToAck = e.state;
+    if (load('show_popup', 'true') == 'true') {
       timer.popup = new Popup(e.state);
-    });
+    }
+  });
 
 
 
   this.giveAckFor = new EventPoint(this);
   this.giveAckFor.addListener(function (e) {
-      self.machine.accept('ack '+self.stateToAck);
-      self.stateToAck = null;
-    });
+    self.machine.accept('ack '+self.stateToAck);
+    self.stateToAck = null;
+  });
 
 
 
@@ -157,7 +159,7 @@ Timer = function(storage, ch) {
   this.writePeriodToCalendar = function() {
     if (load('calendar_sync', 'false') == 'false') {
       console.log('calendar sync is turned off.')
-      return;
+        return;
     }
     // work time = working time + decompression time
     // -- since you need decompression after working to maintain
@@ -173,10 +175,10 @@ Timer = function(storage, ch) {
 
 
 
-  
+
 
   // the mighty state machine
-  
+
   this.machine = (new FSM('ChromoDoro', true)).
     onChange.addListener(function(e) {
       storage['period'] = e.newState.name;
@@ -187,169 +189,169 @@ Timer = function(storage, ch) {
 
   // every tick update the counter and tooltip
   var tick = function(e) {
-      if (e.input == 'tick') {
-        ch.browserAction.setTitle({title:'You are '+this.name+'.'});
+    if (e.input == 'tick') {
+      ch.browserAction.setTitle({title:'You are '+this.name+'.'});
 
-        // display minutes left
-        var rest = time_left();
-        ch.browserAction.setBadgeText({
-          text : Math.ceil(rest / 60)+''
-        });
-        e.accept();
-      }
-    };
+      // display minutes left
+      var rest = time_left();
+      ch.browserAction.setBadgeText({
+        text : Math.ceil(rest / 60)+''
+      });
+      e.accept();
+    }
+  };
 
 
-  // -- STOPPED -- 
+  // -- STOPPED --
   this.machine.addState('stopped').
-    onEnter.addListener(function(e) {    
-        ch.browserAction.setBadgeText({text : ''});
-        ch.browserAction.setTitle({title:'Click to activate.'});
-        
-        clearTimeout(self.timeout);
-        timer.timeout = null;
+    onEnter.addListener(function(e) {
+      ch.browserAction.setBadgeText({text : ''});
+      ch.browserAction.setTitle({title:'Click to activate.'});
 
-        // close ack request if showting
-        if (self.popup) {
-          self.popup.close();
-        }
-      }).
-    addListener(function(e) {
-        if (e.input == 'click') {
-          countdown(load('work_length', 25) * 60);
-          this.machine.setState('working');
-          // start ticking
-          self.tick(true);
-          e.accept();
-        }
-      }).
-    addListener(tick);
+      clearTimeout(self.timeout);
+      timer.timeout = null;
+
+      // close ack request if showting
+      if (self.popup) {
+        self.popup.close();
+      }
+    }).
+  addListener(function(e) {
+    if (e.input == 'click') {
+      countdown(load('work_length', 25) * 60);
+      this.machine.setState('working');
+      // start ticking
+      self.tick(true);
+      e.accept();
+    }
+  }).
+  addListener(tick);
 
 
   // stop after clicking pomodoro
   var stop = function(e) {
-      if (e.input == 'click') {
-        this.machine.setState('stopped');
-        e.accept();
-      }
-    };
+    if (e.input == 'click') {
+      this.machine.setState('stopped');
+      e.accept();
+    }
+  };
 
 
   // -- WORKING --
-  this.machine.addState('working').    
+  this.machine.addState('working').
     onEnter.addListener(function(e) {
-        // set badge to red
-        self.tick(); //reset badge immediately
-        ch.browserAction.setBadgeBackgroundColor({color:[180,0,0,255]});
+      // set badge to red
+      self.tick(); //reset badge immediately
+      ch.browserAction.setBadgeBackgroundColor({color:[180,0,0,255]});
 
-        // close ack request if showing
-        if (self.popup) {
-          self.popup.close();
-        }
-      }).
-    addListener(stop).
+      // close ack request if showing
+      if (self.popup) {
+        self.popup.close();
+      }
+    }).
+  addListener(stop).
     addListener(tick).
     addListener(function(e) {
-        if (e.input == 'tick' && time_left() <= 0) {
-          setTimeout('timer.writePeriodToCalendar()', 1000);
-          this.machine.setState('waiting for rest ack');
-          e.accept();
-          e.stop();
-        }        
-      });
-    
+      if (e.input == 'tick' && time_left() <= 0) {
+        setTimeout('timer.writePeriodToCalendar()', 1000);
+        this.machine.setState('waiting for rest ack');
+        e.accept();
+        e.stop();
+      }
+    });
+
 
 
   // -- WAITING FOR REST ACK --
   this.machine.addState('waiting for rest ack').
     onEnter.addListener(function() {
-        ch.browserAction.setBadgeText({text : 'ACK'});
-        self.requestAckFor.fire({state:'rest'});
-        timer.beep();
-      }).
-    addListener(function(e) {
-        if (e.input == 'ack rest') {
-          e.accept();
-          this.machine.setState('start resting');
-        }
-      }).
-    addListener(function(e) {
-        if (e.input == 'click') {
-          e.accept();
-          this.machine.accept('ack rest');
-        }
-      }).
-    addListener(function(e) {
-        if (e.input == 'tick') {
-          e.accept();
-        }
-      });
+      ch.browserAction.setBadgeText({text : 'ACK'});
+      self.requestAckFor.fire({state:'rest'});
+      timer.beep();
+    }).
+  addListener(function(e) {
+    if (e.input == 'ack rest') {
+      e.accept();
+      this.machine.setState('start resting');
+    }
+  }).
+  addListener(function(e) {
+    if (e.input == 'click') {
+      e.accept();
+      this.machine.accept('ack rest');
+    }
+  }).
+  addListener(function(e) {
+    if (e.input == 'tick') {
+      e.accept();
+    }
+  });
 
 
   // -- START RESTING --
   this.machine.addState('start resting').
     onEnter.addListener(function(e) {
-        // start countdown
-        countdown(load('rest_length', 5) * 60);
-        e.accept();
-        this.machine.setState('resting');
-        
-        // close ack request if showting
-        if (self.popup) {
-          self.popup.close();
-        }
-      }).
-    addListener(function(e) {
-        if (e.input == 'tick') {
-          e.accept();
-        }
-      })
+      // start countdown
+      countdown(load('rest_length', 5) * 60);
+      e.accept();
+      this.machine.setState('resting');
+
+      // close ack request if showting
+      if (self.popup) {
+        self.popup.close();
+      }
+    }).
+  addListener(function(e) {
+    if (e.input == 'tick') {
+      e.accept();
+    }
+  })
 
   // -- RESTING --
   this.machine.addState('resting').
     onEnter.addListener(function(e) {
-        // set badge to green
-        ch.browserAction.setBadgeBackgroundColor({color:[0,180,0,255]});
-        self.tick();
-      }).
-    addListener(function(e) {
-        if (e.input == 'tick' && time_left() <= 0) {
-          this.machine.setState('waiting for work ack');
-        }
-      }).
-    addListener(stop).
+      // set badge to green
+      ch.browserAction.setBadgeBackgroundColor({color:[0,180,0,255]});
+      self.tick();
+    }).
+  addListener(function(e) {
+    if (e.input == 'tick' && time_left() <= 0) {
+      this.machine.setState('waiting for work ack');
+    }
+  }).
+  addListener(stop).
     addListener(tick);
 
 
   // -- WAITING FOR WORK ACK --
   this.machine.addState('waiting for work ack').
     onEnter.addListener(function() {
-        ch.browserAction.setBadgeText({text : 'ACK'});
-        self.requestAckFor.fire({state:'work'});
-        timer.beep();
-      }).
-    addListener(function(e) {
-        if (e.input == 'ack work') {
-          countdown(load('work_length', 25) * 60, true);
-          this.machine.setState('working');
-          e.accept();
-        }
-      }).
-    addListener(function(e) {
-        if (e.input == 'click') {
-          e.accept();
-          this.machine.accept('ack work');
-        }
-      }).
-    addListener(function(e) {
-        if (e.input == 'tick') {
-          e.accept();
-        }
-      });
-    
-  
+      ch.browserAction.setBadgeText({text : 'ACK'});
+      self.requestAckFor.fire({state:'work'});
+      timer.beep();
+    }).
+  addListener(function(e) {
+    if (e.input == 'ack work') {
+      countdown(load('work_length', 25) * 60, true);
+      this.machine.setState('working');
+      e.accept();
+    }
+  }).
+  addListener(function(e) {
+    if (e.input == 'click') {
+      e.accept();
+      this.machine.accept('ack work');
+    }
+  }).
+  addListener(function(e) {
+    if (e.input == 'tick') {
+      e.accept();
+    }
+  });
 
-  // initialize  
+
+
+  // initialize
   ch.browserAction.setIcon({path:'chromodoro_'+load('icon', 'default')+'.png'});
 
 
@@ -361,30 +363,30 @@ Timer = function(storage, ch) {
 
 
   ch.extension.onRequest.addListener(
-    function(request, sender, sendResponse) {
-      try {
-        if (request.popupReady) {
-          sendResponse({showAckFor: timer.stateToAck});
-        } else if (request.name == "ackRest") {
-          self.giveAckFor.fire();
-          self.popup.close();
-          self.popup = null;
-          sendResponse('ok');
+      function(request, sender, sendResponse) {
+        try {
+          if (request.popupReady) {
+            sendResponse({showAckFor: timer.stateToAck});
+          } else if (request.name == "ackRest") {
+            self.giveAckFor.fire();
+            self.popup.close();
+            self.popup = null;
+            sendResponse('ok');
+          }
+        } catch (e) {
+          console.error(e);
         }
-      } catch (e) {
-        console.error(e);
       }
-    }
-  );
+      );
 
-  
+
   ch.browserAction.onClicked.addListener(
-    function(timer) {    
-      return function(tab) {
-        timer.machine.accept('click');
-      }
-    }(self)
-  );
-  
-  
+      function(timer) {
+        return function(tab) {
+          timer.machine.accept('click');
+        }
+      }(self)
+      );
+
+
 }
