@@ -1,28 +1,9 @@
 #summary How you can support the extension development.
 
-== Tell me your story ==
-
-I would like to hear about what you use ChromoDoro for. [mailto:michal.hantl@gmail.com Tell me] your story so I can make it better.
-
-
-== Sponsor a feature ==
-
-Is there a feature you would like to have? Just [mailto:michal.hantl@gmail.com drop me an email].
-
-
-== Say "thank you" ==
-
-If you want to thank me, a dollar or two does that best :)
-
-<a href='http://www.pledgie.com/campaigns/8385'><img alt='Click here to lend your support to: ChromoDoro development and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/8385.png?skin_name=chrome' border='0' /></a>
-(paypal)
-
-
-*Donors*
-
-Thank you guys!
+=You guys ROCK!=
 
  # Břetislav Krček, 10 USD (http://www.piskvorky.cz/)
  # Chthonic, 1 USD
 
-Let me know if a you have a link I can use here.
+
+<a href='http://www.pledgie.com/campaigns/8385'><img alt='Click here to lend your support to: ChromoDoro development and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/8385.png?skin_name=chrome' border='0' /></a>
